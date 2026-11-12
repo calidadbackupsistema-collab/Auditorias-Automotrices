@@ -26,7 +26,8 @@ Configuración necesaria en la consola de Firebase (solo una vez):
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /salas/{sala} {
+    // incluye la subcolección de fotos de evidencia (salas/{sala}/fotos/{id})
+    match /salas/{sala}/{document=**} {
       allow read, write: if request.auth != null;
     }
   }
@@ -40,3 +41,8 @@ Sin estos tres pasos la barra de nube mostrará "Error de nube" y la plataforma 
 1. Abrir el sitio, escribir el código de sala y **Conectar**.
 2. Elegir la auditoría en el carrusel y **Abrir**.
 3. Al cerrar el día, **Exportar respaldo** (JSON) desde la tarjeta Respaldo.
+
+
+## SQ-Mark (Ver 5.1 oficial)
+
+47 ítems · 1,000 pts · 6 niveles de calificación · grado S/A/B/C/D. Cada ítem admite fotos de evidencia (cámara o galería). **Imprimir informe** genera: informe principal, hoja de evaluación, hoja de hallazgos y anexo fotográfico opcional (con el formato del Excel oficial).
