@@ -535,23 +535,27 @@ function cloudInit(){if(!window.firebase||!window.HPM_FIREBASE||!HPM_FIREBASE.ap
   addEventListener("online",()=>{if(CLOUD.ref)setCloud("ok");});addEventListener("offline",()=>{if(CLOUD.ref)setCloud("off");});
  }catch(e){setCloud("err",e.message);}}
 const clean=o=>JSON.parse(JSON.stringify(o));
+/* Firestore no admite arreglos dentro de arreglos: se guardan como texto JSON y se restauran al leer */
+function fl(v){if(Array.isArray(v)){if(v.some(Array.isArray))return{__na:JSON.stringify(v)};return v.map(fl);}if(v&&typeof v==="object"){const o={};for(const k in v)o[k]=fl(v[k]);return o;}return v;}
+function unfl(v){if(Array.isArray(v))return v.map(unfl);if(v&&typeof v==="object"){const ks=Object.keys(v);if(ks.length===1&&ks[0]==="__na"&&typeof v.__na==="string"){try{return JSON.parse(v.__na);}catch(_){return[];}}const o={};ks.forEach(k=>o[k]=unfl(v[k]));return o;}return v;}
 function joinRoom(code){code=String(code||"").toUpperCase().replace(/[^A-Z0-9_-]/g,"").slice(0,24);if(!code||!CLOUD.ready)return;
  if(CLOUD.unsub)CLOUD.unsub();G.room=code;sv(KG,G);CLOUD.last={};CLOUD.ref=CLOUD.db.collection("salas").doc(code);setCloud("join");phListen();
  CLOUD.unsub=CLOUD.ref.onSnapshot(doc=>{if(!doc.exists){const p={g:{prof:G.prof},sq:clean(SQ),vda:clean(VDA),createdAt:firebase.firestore.FieldValue.serverTimestamp(),updatedAt:firebase.firestore.FieldValue.serverTimestamp(),by:G.prof.aud||"—"};try{const ia=JSON.parse(localStorage.getItem(KIATF));if(ia)p.iatf=clean(ia);}catch(_){}
-   Object.keys(p).forEach(k=>{if(["g","sq","vda","iatf"].includes(k))CLOUD.last[k]=JSON.stringify(p[k]);});CLOUD.ref.set(p).then(()=>setCloud(navigator.onLine?"ok":"off")).catch(e=>setCloud("err",e.code||e.message));return;}
+   Object.keys(p).forEach(k=>{if(["g","sq","vda","iatf"].includes(k)){p[k]=fl(p[k]);CLOUD.last[k]=JSON.stringify(p[k]);}});CLOUD.ref.set(p).then(()=>setCloud(navigator.onLine?"ok":"off")).catch(e=>setCloud("err",e.code||e.message));return;}
   if(doc.metadata.hasPendingWrites){setCloud(navigator.onLine?"ok":"off");return;}
   applyRemote(doc.data());setCloud(navigator.onLine?"ok":"off");},e=>setCloud("err",e.code||e.message));}
 function leaveRoom(){if(CLOUD.unsub)CLOUD.unsub();if(CLOUD.unsubPh)CLOUD.unsubPh();CLOUD.unsubPh=null;CLOUD.unsub=null;CLOUD.ref=null;G.room="";sv(KG,G);setCloud("idle");}
 function applyRemote(d){if(!d)return;const ae=document.activeElement;if(ae&&(ae.tagName==="INPUT"||ae.tagName==="TEXTAREA")&&ae.id!=="room"){CLOUD.pending=d;return;}
+ const raw=d;d=Object.assign({},d);["g","sq","vda","iatf"].forEach(k=>{if(d[k]!=null)d[k]=unfl(d[k]);});
  let ch=false;
- ["g","sq","vda","iatf"].forEach(k=>{if(d[k]==null)return;const js=JSON.stringify(d[k]);if(js===CLOUD.last[k])return;CLOUD.last[k]=js;ch=true;
+ ["g","sq","vda","iatf"].forEach(k=>{if(d[k]==null)return;const js=JSON.stringify(raw[k]);if(js===CLOUD.last[k])return;CLOUD.last[k]=js;ch=true;
   if(k==="g"){G.prof=Object.assign(G.prof,d.g.prof||{});sv(KG,G);}
   if(k==="sq"){if(!d.sq||d.sq.v!==2)return;const t=SQ.tab,c=SQ.cat,ex=SQ.exp,an=SQ.annex;SQ=Object.assign(sqDef(),d.sq);SQ.tab=t;SQ.cat=c;SQ.exp=ex;SQ.annex=an;sv(KSQ,SQ);}
   if(k==="vda"){const t=VDA.tab,e=VDA.el,s=VDA.step;VDA=Object.assign({tab:1,el:"P2",step:0,scope:["P2","P3","P4","P5","P6","P7"],steps:["Proceso 1"],prod:"",cust:"",ans:{}},d.vda);VDA.tab=t;VDA.el=e;VDA.step=s;sv(KVDA,VDA);}
   if(k==="iatf"){try{const loc=JSON.parse(localStorage.getItem(KIATF)||"null");const r=d.iatf;if(loc){r.step=loc.step;r.cur=loc.cur;r.lang=G.lang;}localStorage.setItem(KIATF,JSON.stringify(r));const w=ifr().contentWindow;if(w&&w.load){w.eval("load();render();");}}catch(_){}}});
  if(ch){rerender();toast(x("Actualizado desde la nube","Updated from cloud","클라우드에서 업데이트됨"));}}
 document.addEventListener("focusout",()=>{if(CLOUD.pending){const d=CLOUD.pending;CLOUD.pending=null;setTimeout(()=>applyRemote(d),50);}});
-function cloudPush(k,obj){if(!CLOUD.ref)return;clearTimeout(CLOUD.timers[k]);CLOUD.timers[k]=setTimeout(()=>{const v=clean(obj);const js=JSON.stringify(v);if(js===CLOUD.last[k])return;CLOUD.last[k]=js;const p={updatedAt:firebase.firestore.FieldValue.serverTimestamp(),by:G.prof.aud||"—"};p[k]=v;
+function cloudPush(k,obj){if(!CLOUD.ref)return;clearTimeout(CLOUD.timers[k]);CLOUD.timers[k]=setTimeout(()=>{const v=fl(clean(obj));const js=JSON.stringify(v);if(js===CLOUD.last[k])return;CLOUD.last[k]=js;const p={updatedAt:firebase.firestore.FieldValue.serverTimestamp(),by:G.prof.aud||"—"};p[k]=v;
  CLOUD.ref.set(p,{mergeFields:[k,"updatedAt","by"]}).catch(e=>setCloud("err",e.code||e.message));},700);}
 addEventListener("message",e=>{if(e.data&&e.data.t==="iatf"){try{cloudPush("iatf",JSON.parse(localStorage.getItem(KIATF)));}catch(_){}if(!cur)paint();}});
 /* ====================== LOBBY ====================== */
