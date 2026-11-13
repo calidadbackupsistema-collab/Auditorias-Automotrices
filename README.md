@@ -12,9 +12,16 @@ Sitio: https://calidadbackupsistema-collab.github.io/Auditorias-Automotrices/
 | `firebase-config.js` | Configuración del proyecto Firebase `sistema-de-auditorias`. Si no existe, la plataforma trabaja en modo local. |
 | `HPM_Auditoria_IATF16949_v4.html` | Versión independiente de la auditoría IATF (se conserva como referencia). |
 
-## Sincronización en la nube (Firebase)
+## Acceso y salas
 
-Todos los equipos que escriban el **mismo código de sala** (por ejemplo `HPM-2026`) ven y editan las mismas tres auditorías en tiempo real. Los datos se guardan en Firestore en `salas/{CÓDIGO}` y además en el navegador de cada equipo.
+Al abrir la plataforma se pide acceso:
+
+- **Administrador** (contraseña de administrador): edita todo, ve el Lobby y, **dentro de cada auditoría**, configura la **Sala** y los **accesos** (botón «Sala y accesos · Plan PDF» en los datos de la auditoría). Cada acceso tiene nombre/rol, permiso (*puede editar* o *solo lectura*) y un código propio. Desde ahí imprime el **Plan de Auditoría + contraseñas** en PDF para la empresa auditada.
+- **Participante**: entra con *Sala + código personal*; solo ve la auditoría de esa sala, con el permiso asignado.
+
+Cada auditoría tiene su propia sala en Firestore (`salas/{SALA}`, con la auditoría y un bloque `meta` con los códigos **en hash SHA-256**; los códigos en claro solo viven en el equipo del administrador y en el PDF impreso).
+
+**Importante (seguridad):** la validación de contraseña y los permisos se aplican en la interfaz del navegador. Frena el uso normal, pero no es seguridad fuerte: quien conozca el proyecto Firebase y la sala puede leer/escribir saltándose la interfaz. Para protección real, usar Firebase Auth con usuarios y reglas de Firestore por sala/rol.
 
 Configuración necesaria en la consola de Firebase (solo una vez):
 
@@ -38,8 +45,8 @@ Sin estos tres pasos la barra de nube mostrará "Error de nube" y la plataforma 
 
 ## Uso
 
-1. Abrir el sitio, escribir el código de sala y **Conectar**.
-2. Elegir la auditoría en el carrusel y **Abrir**.
+1. Abrir el sitio y entrar como Administrador (o como Participante con sala y código).
+2. Administrador: elegir la auditoría, capturar datos iniciales, **Sala y accesos** → *Guardar y conectar* → *Imprimir PDF*.
 3. Al cerrar el día, **Exportar respaldo** (JSON) desde la tarjeta Respaldo.
 
 
