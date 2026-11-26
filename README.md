@@ -1,6 +1,6 @@
 # Plataforma de Auditorías HPM
 
-Lobby de auditorías de Hyundai Polytech México: **IATF 16949:2016**, **Hyundai SQ-Mark (inyección)**, **VDA 6.3** y **VDA · IA en la Gestión de Calidad (Volumen Amarillo 2026)**, en un solo archivo (`index.html`) publicado con GitHub Pages.
+Lobby de auditorías de Hyundai Polytech México: **IATF 16949:2016**, **Hyundai SQ-Mark (inyección)**, **VDA 6.3** **VDA · IA en la Gestión de Calidad (Volumen Amarillo 2026)** y **Auditoría de Segundo Nivel (Clientes)**, en un solo archivo (`index.html`) publicado con GitHub Pages.
 
 Sitio: https://calidadbackupsistema-collab.github.io/Auditorias-Automotrices/
 
@@ -58,3 +58,8 @@ Sin estos tres pasos la barra de nube mostrará "Error de nube" y la plataforma 
 ## VDA · IA en la Gestión de Calidad (AIQM)
 
 Basada en el cap. 5 del volumen VDA «Artificial Intelligence in Quality Management» (1.ª ed., marzo 2026). Paso 1: clase de riesgo del proyecto AIQM-1/2/3 (7 grupos; gana el más alto). Paso 2: 37 requisitos en 11 fases, exigibles según la clase, cada uno con su evidencia esperada; cumple / no cumple (con riesgo residual y medida) / n.a. (con motivo). Incluye informe imprimible. Los textos del manual se muestran en español e inglés (coreano usa inglés).
+
+
+## Auditoría de Segundo Nivel (Clientes)
+
+El auditor interno de HPM define las **áreas y productos** a auditar (cada renglón es un punto de auditoría) y elige o agrega las preguntas. Banco base editable: Plan de Control, pruebas de calidad, reportes de liberación (PQC) y parámetros de máquina; se pueden desactivar preguntas, agregar preguntas propias y crear temas nuevos. Cada pregunta se califica por área/producto (cumple / no cumple / n.a.) con evidencia revisada, hallazgo, acción, responsable, fecha y hasta 5 fotos. Incluye resultado por área y por tema e informe imprimible con anexo fotográfico. Tiene sala y accesos como las demás auditorías.
